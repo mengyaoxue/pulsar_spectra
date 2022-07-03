@@ -118,9 +118,9 @@ def plot_fit(freqs_MHz, fluxs_mJy, flux_errs_mJy, ref, model, iminuit_result, fi
         ref_markers = {}
 
     # Set up plot
-    plotsize = 3.2
+    plotsize = 4.3
     if axis is None:
-        fig, ax = plt.subplots(figsize=(plotsize*4/3, plotsize))
+        fig, ax = plt.subplots(figsize=(plotsize, plotsize))
     else:
         ax = axis
 
@@ -236,7 +236,7 @@ def plot_fit(freqs_MHz, fluxs_mJy, flux_errs_mJy, ref, model, iminuit_result, fi
     ax.grid(visible=True, ls=':', lw=0.6)
     if axis is None:
         # Not using axis mode so save figure
-        plt.savefig(save_name, bbox_inches='tight', dpi=300)
+        plt.savefig(save_name, bbox_inches='tight', dpi=600, transparent=True)
         plt.clf()
 
 
@@ -325,7 +325,11 @@ def iminuit_fit_spectral_model(
 
     if model_name == "high_frequency_cut_off_power_law" and mod_limits[0] is None:
         # will set the cut off frequency based on the data set's frequency range
-        mod_limits[0] = (min(freqs_Hz), 100 * max(freqs_Hz))
+        #mod_limits[0] = (min(freqs_Hz), 100 * max(freqs_Hz))
+        if 1000 * max(freqs_Hz) > 3e9:
+            mod_limits[0] = (3e9, 1000 * max(freqs_Hz))
+        else:
+            mod_limits[0] = (3e9, 10e9)
 
     # Check if enough inputs
     k = len(start_params)-1 # number of free model parameters
@@ -461,7 +465,7 @@ def find_best_spectral_fit(pulsar, freqs_MHz, fluxs_mJy, flux_errs_mJy, ref_all,
     for i, model_name in enumerate(model_dict.keys()):
         model_function, short_name, start_params, mod_limits = model_dict[model_name]
         aic, iminuit_result, fit_info = iminuit_fit_spectral_model(freqs_MHz, fluxs_mJy, flux_errs_mJy, ref_all,
-                        model_name=model_name, plot=plot_all, plot_error=plot_error, save_name=f"{pulsar}_{model_name}_fit.png",
+                        model_name=model_name, plot=plot_all, plot_error=plot_error, save_name=f"{pulsar}_{model_name}_fit.pdf",
                         alternate_style=alternate_style, axis=axis, secondary_fit=secondary_fit, ref_markers=ref_markers)
         logger.debug(f"{model_name} model fit gave AIC {aic}.")
         if iminuit_result is not None:
@@ -517,7 +521,7 @@ def find_best_spectral_fit(pulsar, freqs_MHz, fluxs_mJy, flux_errs_mJy, ref_all,
             plt.clf()
         if plot_best:
             plot_fit(freqs_MHz, fluxs_mJy, flux_errs_mJy, ref_all, model_dict[best_model_name][0], iminuit_results[aici], fit_infos[aici],
-                    save_name=f"{pulsar}_{best_model_name}_fit.png", plot_error=plot_error, alternate_style=alternate_style,
+                    save_name=f"{pulsar}_{best_model_name}_fit.pdf", plot_error=plot_error, alternate_style=alternate_style,
                     axis=axis, secondary_fit=secondary_fit, fit_range=fit_range, ref_markers=ref_markers)
         return best_model_name, iminuit_results[aici], fit_infos[aici], p_best, p_category
 
