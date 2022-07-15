@@ -95,3 +95,8 @@ def calc_high_frequency_cutoff_emission_height(psrname, v_c, u_v_c, z_surf=12, u
     u_z_percent = u_z_e*100/r_lc
 
     return B_pc, u_B_pc, B_surf, B_lc, r_lc, z_e, u_z_e, z_percent, u_z_percent
+
+
+def calc_emission_measurement(vpeak, alpha, T_e):
+    emission_measure = ( vpeak / ( 433 * (-alpha)**(-0.476) * T_e**(-0.643) ) )**(-0.476)
+    return emission_measure
